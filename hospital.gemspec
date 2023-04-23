@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description            = "Imagine a team of little doctors creating diagnoses and creating a useful report."
   spec.homepage               = "https://github.com/giantmonkey/hospital"
   spec.license                = "MIT"
-  spec.required_ruby_version  = ">= 2.6.0"
+  spec.required_ruby_version  = ">= 2.3.8"
 
   # spec.metadata["allowed_push_host"]  = "'https://rubygems.org'"
 
