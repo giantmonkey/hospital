@@ -2,7 +2,7 @@ class Hospital::Diagnosis
   attr_reader :infos, :warnings, :errors, :name, :results
 
   def initialize name, required_env_vars: []
-    @name               = name
+    @name               = name.to_s
     @required_env_vars  = required_env_vars
     reset
 
@@ -10,10 +10,10 @@ class Hospital::Diagnosis
   end
 
   def reset
-    @infos              = []
-    @warnings           = []
-    @errors             = []
-    @results            = []
+    @infos    = []
+    @warnings = []
+    @errors   = []
+    @results  = []
   end
 
   def check_required_env_vars

@@ -2,24 +2,32 @@
 
 class Patient
   extend Hospital::Doctor
+
+  def self.check_check; end
 end
 
 class Patient2
   extend Hospital::Doctor
 
-  def self.do_checks
-    diagnosis.add_warning('Something is strange.')
+  checkup ->(doctor) do
+    check_check
+    doctor.add_warning('Something is strange.')
   end
+
+  def self.check_check; end
 end
 
 class Patient3
   extend Hospital::Doctor
 
-  def self.do_checks
-    diagnosis.add_warning('Something strange.')
-    diagnosis.add_error('Something is VERY wrong.')
-    diagnosis.add_info('Yay!')
+  checkup ->(doctor) do
+    check_check
+    doctor.add_warning('Something strange.')
+    doctor.add_error('Something is VERY wrong.')
+    doctor.add_info('Yay!')
   end
+
+  def self.check_check; end
 end
 
 RSpec.describe Hospital do
@@ -29,17 +37,17 @@ RSpec.describe Hospital do
 
   describe Hospital::Doctor do
     it "returns a warning if checkup not overwritten" do
-      diagnosis = Patient.checkup
-      expect(diagnosis.warnings.map &:message).to eq ['No checks defined! Please define your own self.do_checks.']
+      diagnosis = Hospital::Doctor.checkup(Patient)
+      expect(diagnosis.warnings.map &:message).to eq ['Patient: No checks defined! Please call checkup with a lambda.']
     end
 
     it "returns doctors warnings if checkup overwritten" do
-      diagnosis = Patient2.checkup
+      diagnosis = Hospital::Doctor.checkup(Patient2)
       expect(diagnosis.warnings.map &:message).to eq ['Something is strange.']
     end
 
     it 'has the class name in the diagnosis' do
-      diagnosis = Patient2.checkup
+      diagnosis = Hospital::Doctor.checkup(Patient2)
       expect(diagnosis.name).to eq 'Patient2'
     end
 
@@ -54,8 +62,8 @@ RSpec.describe Hospital do
     describe '.checkup_all' do
       it 'runs all checkups' do
 
-        [Patient, Patient2].each do |patient|
-          expect(patient).to receive(:checkup).and_call_original
+        [Patient2, Patient3].each do |patient|
+          expect(patient).to receive(:check_check)
         end
 
         Hospital::Doctor.checkup_all

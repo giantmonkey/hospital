@@ -5,18 +5,18 @@ require_relative '../../hospital'
 class Test
   extend Hospital::Doctor
 
-  def self.do_checks
-    diagnosis.add_warning 'nonono'
-    diagnosis.add_error 'nonono!!!!'
-    diagnosis.add_info 'nonono!!!!'
+  checkup -> (doctor) do
+    doctor.add_warning 'nonono'
+    doctor.add_error 'nonono!!!!'
+    doctor.add_info 'nonono!!!!'
   end
 end
 
 class Test2
   extend Hospital::Doctor
 
-  def self.do_checks
-    diagnosis.add_error 'nonono!!!!'
+  checkup -> (doctor) do
+    doctor.add_error 'nonono!!!!'
   end
 end
 

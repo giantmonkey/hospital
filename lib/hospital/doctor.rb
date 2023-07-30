@@ -1,41 +1,34 @@
 require_relative "diagnosis"
 
 module Hospital::Doctor
-  @@classes = []
+  @@checkups    = {}
+  @@diagnosises = {}
 
   def self.included(base)
     raise Hospital::Error.new("Cannot include Hospital::Doctor, please extend instead.")
   end
 
   def self.extended(base)
-    @@classes << base
+    @@checkups[base] = ->(diagnosis) do
+      diagnosis.add_warning("#{base}: No checks defined! Please call checkup with a lambda.")
+    end
+    @@diagnosises[base] = Hospital::Diagnosis.new(base)
   end
 
-  def checkup
-    diagnosis.reset
-    do_checks
-    diagnosis
+  def checkup code
+    @@checkups[self] = code
+  end
+
+  def self.checkup klass
+    @@diagnosises[klass].reset
+    @@checkups[klass].call(@@diagnosises[klass])
+    @@diagnosises[klass]
   end
 
   def self.checkup_all
-    @@classes.each do |klass|
-      diagnosis = klass.checkup
-      diagnosis.put_results
+    @@checkups.keys.each do |klass|
+      checkup(klass)
+      @@diagnosises[klass].put_results
     end
   end
-
-  def reset
-    @@classes = []
-  end
-
-  private
-
-  def do_checks
-    diagnosis.add_warning('No checks defined! Please define your own self.do_checks.')
-  end
-
-  def diagnosis
-    @diagnosis ||= Hospital::Diagnosis.new(self.name)
-  end
 end
-
