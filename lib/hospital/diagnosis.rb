@@ -1,12 +1,19 @@
-class Diagnosis  
-  attr_reader :name, :results
+class Hospital::Diagnosis  
+  attr_reader :infos, :warnings, :errors, :name, :results
 
   def initialize name, required_env_vars: []
     @name               = name
-    @results            = []
     @required_env_vars  = required_env_vars
+    reset
 
     check_required_env_vars if required_env_vars.any?
+  end
+
+  def reset
+    @infos              = []
+    @warnings           = []
+    @errors             = []
+    @results            = []
   end
 
   def check_required_env_vars
@@ -21,15 +28,62 @@ class Diagnosis
     "[#{vars.map{|v| "'#{v}'"}.join(', ')}]"
   end
 
-  def add_error error
-    @results << {type: :error, message: error}
+  class Result
+    attr_reader :message, :prefix
+
+    def initialize message
+      @message = message
+    end
+
+    def output
+      "#{prefix} #{message.gsub(/\n\z/, '').gsub(/\n/, prefix ? "\n   " : "\n")}"
+    end
+
+    def put 
+      puts output
+    end
   end
 
-  def add_warning warning
-    @results << {type: :warning, message: warning}
+  class Info < Result
+    def prefix; '🟢' end
   end
 
-  def add_success success
-    @results << {type: :success, message: success}
+  class Warning < Result
+    def prefix; '🟠'; end
   end
+
+  class Error < Result
+    def prefix; '🔴'; end
+  end
+
+  def add_info message
+    info = Info.new message
+    @infos    << info
+    @results  << info
+  end
+
+  def add_warning message
+    warning = Warning.new message
+    @warnings << warning
+    @results  << warning
+  end
+
+  def add_error message
+    error = Error.new message
+    @errors   << error
+    @results  << error
+  end
+
+  def put_results
+    put_header "Checking #{name}:"
+    results.each &:put
+  end
+
+  private
+
+  def put_header message
+    puts ''
+    puts "### #{message}"
+  end
+
 end

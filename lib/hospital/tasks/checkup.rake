@@ -2,9 +2,27 @@
 
 require_relative '../../hospital'
 
+class Test
+  extend Hospital::Doctor
+
+  def self.do_checks
+    diagnosis.add_warning 'nonono'
+    diagnosis.add_error 'nonono!!!!'
+    diagnosis.add_info 'nonono!!!!'
+  end
+end
+
+class Test2
+  extend Hospital::Doctor
+
+  def self.do_checks
+    diagnosis.add_error 'nonono!!!!'
+  end
+end
+
 desc 'check system setup sanity'
-task :hospital => [] do
+task :doctor => [] do
   # at_exit { Rake::Task['doctor:summary'].invoke if $!.nil? }
 
-  Hospital::Checkup.do
+  Hospital::Doctor.checkup_all
 end

@@ -27,19 +27,6 @@ RSpec.describe Hospital do
     expect(Hospital::VERSION).not_to be nil
   end
 
-  describe Hospital::Checkup do
-    describe '.checkup' do
-      it 'runs all checkups' do
-
-        [Patient, Patient2].each do |patient|
-          expect(patient).to receive(:checkup)
-        end
-
-        Hospital::Checkup.do
-      end
-    end
-  end
-
   describe Hospital::Doctor do
     it "returns a warning if checkup not overwritten" do
       diagnosis = Patient.checkup
@@ -62,6 +49,17 @@ RSpec.describe Hospital do
           include Hospital::Doctor
         end
       end.to raise_error(Hospital::Error)
+    end
+
+    describe '.checkup_all' do
+      it 'runs all checkups' do
+
+        [Patient, Patient2].each do |patient|
+          expect(patient).to receive(:checkup).and_call_original
+        end
+
+        Hospital::Doctor.checkup_all
+      end
     end
   end
 end
