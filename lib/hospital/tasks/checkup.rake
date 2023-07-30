@@ -3,7 +3,7 @@
 require_relative '../../hospital'
 
 class Test
-  extend Hospital::Doctor
+  extend Hospital
 
   checkup -> (doctor) do
     doctor.add_warning 'nonono'
@@ -13,7 +13,7 @@ class Test
 end
 
 class Test2
-  extend Hospital::Doctor
+  extend Hospital
 
   checkup -> (doctor) do
     doctor.add_error 'nonono!!!!'
@@ -24,5 +24,5 @@ desc 'check system setup sanity'
 task :doctor => [] do
   # at_exit { Rake::Task['doctor:summary'].invoke if $!.nil? }
 
-  Hospital::Doctor.checkup_all
+  Hospital.checkup_all
 end

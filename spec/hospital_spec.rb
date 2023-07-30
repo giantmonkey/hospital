@@ -1,30 +1,30 @@
 # frozen_string_literal: true
 
 class Patient
-  extend Hospital::Doctor
+  extend Hospital
 
   def self.check_check; end
 end
 
 class Patient2
-  extend Hospital::Doctor
+  extend Hospital
 
-  checkup ->(doctor) do
+  checkup ->(d) do
     check_check
-    doctor.add_warning('Something is strange.')
+    d.add_warning('Something is strange.')
   end
 
   def self.check_check; end
 end
 
 class Patient3
-  extend Hospital::Doctor
+  extend Hospital
 
-  checkup ->(doctor) do
+  checkup ->(d) do
     check_check
-    doctor.add_warning('Something strange.')
-    doctor.add_error('Something is VERY wrong.')
-    doctor.add_info('Yay!')
+    d.add_warning('Something strange.')
+    d.add_error('Something is VERY wrong.')
+    d.add_info('Yay!')
   end
 
   def self.check_check; end
@@ -35,26 +35,26 @@ RSpec.describe Hospital do
     expect(Hospital::VERSION).not_to be nil
   end
 
-  describe Hospital::Doctor do
+  describe Hospital do
     it "returns a warning if checkup not overwritten" do
-      diagnosis = Hospital::Doctor.checkup(Patient)
+      diagnosis = Hospital.checkup(Patient)
       expect(diagnosis.warnings.map &:message).to eq ['Patient: No checks defined! Please call checkup with a lambda.']
     end
 
-    it "returns doctors warnings if checkup overwritten" do
-      diagnosis = Hospital::Doctor.checkup(Patient2)
+    it "returns checkups warnings if checkup overwritten" do
+      diagnosis = Hospital.checkup(Patient2)
       expect(diagnosis.warnings.map &:message).to eq ['Something is strange.']
     end
 
     it 'has the class name in the diagnosis' do
-      diagnosis = Hospital::Doctor.checkup(Patient2)
+      diagnosis = Hospital.checkup(Patient2)
       expect(diagnosis.name).to eq 'Patient2'
     end
 
     it 'makes sure it is not included' do
       expect do
         class Patty
-          include Hospital::Doctor
+          include Hospital
         end
       end.to raise_error(Hospital::Error)
     end
@@ -66,7 +66,7 @@ RSpec.describe Hospital do
           expect(patient).to receive(:check_check)
         end
 
-        Hospital::Doctor.checkup_all
+        Hospital.checkup_all
       end
     end
   end
