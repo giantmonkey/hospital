@@ -4,6 +4,8 @@ require_relative "hospital/version"
 require_relative "hospital/diagnosis"
 
 module Hospital
+  require_relative 'railtie' if defined?(Rails)
+
   class Error < StandardError; end
 
   @@checkups    = {}
@@ -31,9 +33,17 @@ module Hospital
   end
 
   def self.checkup_all
+    errcount = 0
     @@checkups.keys.each do |klass|
       checkup(klass)
-      @@diagnosises[klass].put_results
+      diagnosis = @@diagnosises[klass]
+      diagnosis.put_results
+      errcount += diagnosis.errors.count
     end
+
+    puts <<~END
+      Summary:"
+      Errors: #{errcount}
+    END
   end
 end
