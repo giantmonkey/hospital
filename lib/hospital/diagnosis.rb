@@ -1,12 +1,9 @@
 class Hospital::Diagnosis  
   attr_reader :infos, :warnings, :errors, :name, :results
 
-  def initialize name, required_env_vars: []
+  def initialize name
     @name               = name.to_s
-    @required_env_vars  = required_env_vars
     reset
-
-    check_required_env_vars if required_env_vars.any?
   end
 
   def reset
@@ -16,11 +13,11 @@ class Hospital::Diagnosis
     @results  = []
   end
 
-  def check_required_env_vars
-    if (missing_vars = @required_env_vars.select{|var| ENV[var].blank? }).any?
+  def require_env_vars env_vars=[]
+    if (missing_vars = env_vars.select{|var| ENV[var].nil? || ENV[var].empty? }).any?
       add_error("These necessary ENV vars are not set: #{variable_list(missing_vars)}.")
     else
-      add_success("All necessary ENV vars are set.")
+      add_info("All necessary ENV vars are set.")
     end
   end
 

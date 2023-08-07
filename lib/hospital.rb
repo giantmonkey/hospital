@@ -10,7 +10,7 @@ module Hospital
   @@diagnosises = {}
 
   def self.included(base)
-    raise Hospital::Error.new("Cannot include Hospital::Doctor, please extend instead.")
+    raise Hospital::Error.new("Cannot include Hospital, please extend instead.")
   end
 
   def self.extended(base)

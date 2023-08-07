@@ -25,6 +25,7 @@ class Patient3
     d.add_warning('Something strange.')
     d.add_error('Something is VERY wrong.')
     d.add_info('Yay!')
+    d.require_env_vars ['MAMA']
   end
 
   def self.check_check; end
@@ -49,6 +50,14 @@ RSpec.describe Hospital do
     it 'has the class name in the diagnosis' do
       diagnosis = Hospital.checkup(Patient2)
       expect(diagnosis.name).to eq 'Patient2'
+    end
+
+    it 'executes require_env_vars method on the diagnosis' do
+      diagnosis = Hospital.checkup(Patient3)
+      expect(diagnosis.errors.map &:message).to eq [
+        "Something is VERY wrong.",
+        "These necessary ENV vars are not set: ['MAMA']."
+      ]
     end
 
     it 'makes sure it is not included' do
