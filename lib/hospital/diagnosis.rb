@@ -14,8 +14,10 @@ class Hospital::Diagnosis
   end
 
   def require_env_vars env_vars=[]
+    success = true
     if (missing_vars = env_vars.select{|var| ENV[var].nil? || ENV[var].empty? }).any?
       add_error("These necessary ENV vars are not set: #{variable_list(missing_vars)}.")
+      success = false
     else
       add_info("All necessary ENV vars are set.")
     end
