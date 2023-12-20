@@ -42,7 +42,8 @@ module Hospital
     end
 
     puts <<~END
-      Summary:"
+
+      Summary:
       Errors: #{errcount}
     END
   end
