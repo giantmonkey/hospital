@@ -9,6 +9,7 @@ module Hospital
   class Error < StandardError; end
 
   @@checkups    = {}
+  @@conditions  = {}
   @@diagnosises = {}
 
   def self.included(base)
@@ -22,14 +23,17 @@ module Hospital
     @@diagnosises[base] = Hospital::Diagnosis.new(base)
   end
 
-  def checkup &code
-    @@checkups[self] = code
+  def checkup if: -> { true }, &code
+    @@conditions[self]  = binding.local_variable_get('if')
+    @@checkups[self]    = code
   end
 
   def self.checkup klass
-    @@diagnosises[klass].reset
-    @@checkups[klass].call(@@diagnosises[klass])
-    @@diagnosises[klass]
+    if @@conditions[klass].call
+      @@diagnosises[klass].reset
+      @@checkups[klass].call(@@diagnosises[klass])
+      @@diagnosises[klass]
+    end
   end
 
   def self.checkup_all
