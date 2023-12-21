@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    hospital (0.2.0)
+    hospital (0.4.0)
 
 GEM
   remote: https://rubygems.org/
@@ -31,4 +31,4 @@ DEPENDENCIES
   rspec (~> 3.0)
 
 BUNDLED WITH
-   1.17.2
+   2.4.19

@@ -16,13 +16,13 @@ module Hospital
   end
 
   def self.extended(base)
-    @@checkups[base] = ->(diagnosis) do
+    @@checkups[base] = -> (diagnosis) do
       diagnosis.add_warning("#{base}: No checks defined! Please call checkup with a lambda.")
     end
     @@diagnosises[base] = Hospital::Diagnosis.new(base)
   end
 
-  def checkup code
+  def checkup &code
     @@checkups[self] = code
   end
 

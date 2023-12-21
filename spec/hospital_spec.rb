@@ -9,7 +9,7 @@ end
 class Patient2
   extend Hospital
 
-  checkup ->(d) do
+  checkup do |d|
     check_check
     d.add_warning('Something is strange.')
   end
@@ -20,7 +20,7 @@ end
 class Patient3
   extend Hospital
 
-  checkup ->(d) do
+  checkup do |d|
     check_check
     d.add_warning('Something strange.')
     d.add_error('Something is VERY wrong.')
