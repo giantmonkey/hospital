@@ -29,7 +29,7 @@ module Hospital
   end
 
   def self.checkup klass
-    if @@conditions[klass].call
+    if @@conditions[klass].nil? || @@conditions[klass].call
       @@diagnosises[klass].reset
       @@checkups[klass].call(@@diagnosises[klass])
       @@diagnosises[klass]

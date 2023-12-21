@@ -31,6 +31,17 @@ class Patient3
   def self.check_check; end
 end
 
+class Patient4
+  extend Hospital
+
+  checkup if: -> { false } do |d|
+    check_check
+    d.add_warning('I should not be called :-)')
+  end
+
+  def self.check_check; end
+end
+
 RSpec.describe Hospital do
   it "has a version number" do
     expect(Hospital::VERSION).not_to be nil
@@ -73,6 +84,10 @@ RSpec.describe Hospital do
 
         [Patient2, Patient3].each do |patient|
           expect(patient).to receive(:check_check)
+        end
+
+        [Patient, Patient4].each do |patient|
+          expect(patient).not_to receive(:check_check)
         end
 
         Hospital.checkup_all
