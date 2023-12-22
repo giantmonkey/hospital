@@ -27,6 +27,12 @@ class Hospital::Diagnosis
     "[#{vars.map{|v| "'#{v}'"}.join(', ')}]"
   end
 
+  def hide_value value
+    "#{value}"
+      .gsub(/(?<=.{1}).(?=.{2})/, '*')
+      .gsub(/\*{10,}/, '*****...*****')
+  end
+
   class Result
     attr_reader :message, :prefix
 

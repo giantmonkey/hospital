@@ -8,6 +8,7 @@ module Hospital
 
   class Error < StandardError; end
 
+  @@groups      = {}
   @@checkups    = {}
   @@conditions  = {}
   @@diagnosises = {}
@@ -23,32 +24,34 @@ module Hospital
     @@diagnosises[base] = Hospital::Diagnosis.new(base)
   end
 
-  def checkup if: -> { true }, &code
+  def checkup if: -> { true }, group: :general, &code
     @@conditions[self]  = binding.local_variable_get('if')
+    @@groups[self]      = group
     @@checkups[self]    = code
   end
 
   def self.checkup klass
+    diagnosis = @@diagnosises[klass]
     if @@conditions[klass].nil? || @@conditions[klass].call
-      @@diagnosises[klass].reset
-      @@checkups[klass].call(@@diagnosises[klass])
-      @@diagnosises[klass]
+      diagnosis.reset
+      @@checkups[klass].call(diagnosis)
+      diagnosis.put_results
     end
+    diagnosis
   end
 
   def self.checkup_all
     errcount = 0
     @@checkups.keys.each do |klass|
-      checkup(klass)
-      diagnosis = @@diagnosises[klass]
-      diagnosis.put_results
+      diagnosis = checkup(klass)
       errcount += diagnosis.errors.count
     end
 
     puts <<~END
 
       Summary:
-      Errors: #{errcount}
+      Errors:   #{errcount}
+      Warnings: #{errcount}
     END
   end
 end
