@@ -8,50 +8,80 @@ module Hospital
 
   class Error < StandardError; end
 
-  @@groups      = {}
-  @@checkups    = {}
-  @@conditions  = {}
-  @@diagnosises = {}
+  class Checkup 
+    attr_reader :code, :condition, :diagnosis, :group
 
-  def self.included(base)
-    raise Hospital::Error.new("Cannot include Hospital, please extend instead.")
+    def initialize klass, code, group: :general, condition: -> { true }
+      @klass      = klass
+      @code       = code
+      @group      = group
+      @condition  = condition
+      @diagnosis  = Hospital::Diagnosis.new(klass)
+    end
+
+    def reset_diagnosis
+      diagnosis.reset
+    end
+
+    def check
+      if condition.nil? || condition.call
+        diagnosis.reset
+        code.call(diagnosis)
+        diagnosis
+      else
+        nil
+      end
+    end
   end
 
-  def self.extended(base)
-    @@checkups[base] = -> (diagnosis) do
-      diagnosis.add_warning("#{base}: No checks defined! Please call checkup with a lambda.")
+  @@checkups = {}
+
+  class << self
+    def included(klass)
+      raise Hospital::Error.new("Cannot include Hospital, please extend instead.")
     end
-    @@diagnosises[base] = Hospital::Diagnosis.new(base)
+
+    def extended(klass)
+      # only relevant if the class does not yet define a real checkup method
+      @@checkups[klass] = Checkup.new klass, -> (diagnosis) do
+        diagnosis.add_warning("#{klass}: No checks defined! Please call checkup with a lambda.")
+      end, group: :general
+    end
+
+    def do_checkup_all
+      errcount = 0
+      warcount = 0
+      first    = true
+
+      @@checkups.group_by{|klass, checkup| checkup.group}.map do |group, checkups|
+        puts "#{!first ? "\n\n" : ''}#{'#' * 30}\n### #{group.capitalize} checks"
+        first = false
+
+        checkups.each do |klass, checkup|
+          if diagnosis = checkup.check
+            errcount += diagnosis.errors.count
+            warcount += diagnosis.warnings.count
+            diagnosis.put_results
+          end
+        end
+      end
+
+      puts <<~END
+
+        ### Summary:
+        Errors:   #{errcount}
+        Warnings: #{warcount}
+      END
+    end
+
+    # used to call the checkup for a specific class directly (in specs)
+    def do_checkup(klass)
+      @@checkups[klass].check
+    end
   end
 
   def checkup if: -> { true }, group: :general, &code
-    @@conditions[self]  = binding.local_variable_get('if')
-    @@groups[self]      = group
-    @@checkups[self]    = code
+    @@checkups[self] = Checkup.new self, code, group: group, condition: binding.local_variable_get('if')
   end
 
-  def self.checkup klass
-    diagnosis = @@diagnosises[klass]
-    if @@conditions[klass].nil? || @@conditions[klass].call
-      diagnosis.reset
-      @@checkups[klass].call(diagnosis)
-      diagnosis.put_results
-    end
-    diagnosis
-  end
-
-  def self.checkup_all
-    errcount = 0
-    @@checkups.keys.each do |klass|
-      diagnosis = checkup(klass)
-      errcount += diagnosis.errors.count
-    end
-
-    puts <<~END
-
-      Summary:
-      Errors:   #{errcount}
-      Warnings: #{errcount}
-    END
-  end
 end

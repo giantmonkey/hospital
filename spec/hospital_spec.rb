@@ -49,22 +49,22 @@ RSpec.describe Hospital do
 
   describe Hospital do
     it "returns a warning if checkup not overwritten" do
-      diagnosis = Hospital.checkup(Patient)
+      diagnosis = Hospital.do_checkup(Patient)
       expect(diagnosis.warnings.map &:message).to eq ['Patient: No checks defined! Please call checkup with a lambda.']
     end
 
     it "returns checkups warnings if checkup overwritten" do
-      diagnosis = Hospital.checkup(Patient2)
+      diagnosis = Hospital.do_checkup(Patient2)
       expect(diagnosis.warnings.map &:message).to eq ['Something is strange.']
     end
 
     it 'has the class name in the diagnosis' do
-      diagnosis = Hospital.checkup(Patient2)
+      diagnosis = Hospital.do_checkup(Patient2)
       expect(diagnosis.name).to eq 'Patient2'
     end
 
     it 'executes require_env_vars method on the diagnosis' do
-      diagnosis = Hospital.checkup(Patient3)
+      diagnosis = Hospital.do_checkup(Patient3)
       expect(diagnosis.errors.map &:message).to eq [
         "Something is VERY wrong.",
         "These necessary ENV vars are not set: ['MAMA']."
@@ -90,7 +90,7 @@ RSpec.describe Hospital do
           expect(patient).not_to receive(:check_check)
         end
 
-        Hospital.checkup_all
+        Hospital.do_checkup_all
       end
     end
   end
