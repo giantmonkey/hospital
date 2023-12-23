@@ -11,5 +11,5 @@ task :doctor => :environment do
     Rails.application.eager_load!
   end
 
-  Hospital.do_checkup_all
+  Hospital.do_checkup_all # verbose: true
 end

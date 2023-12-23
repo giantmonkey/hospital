@@ -86,6 +86,8 @@ RSpec.describe Hospital do
           expect(patient).to receive(:check_check)
         end
 
+        # Patient  has no checkup defined
+        # Patient4 has the checkup disabled
         [Patient, Patient4].each do |patient|
           expect(patient).not_to receive(:check_check)
         end

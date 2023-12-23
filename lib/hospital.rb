@@ -23,13 +23,19 @@ module Hospital
       diagnosis.reset
     end
 
-    def check
+    def check verbose: false
+      diagnosis.reset
+
       if condition.nil? || condition.call
-        diagnosis.reset
         code.call(diagnosis)
         diagnosis
       else
-        nil
+        if verbose
+          diagnosis.add_info 'Skipped because condition not met.'
+          diagnosis
+        else
+          nil
+        end
       end
     end
   end
@@ -48,17 +54,16 @@ module Hospital
       end, group: :general
     end
 
-    def do_checkup_all
+    def do_checkup_all verbose: false
       errcount = 0
       warcount = 0
-      first    = true
 
       @@checkups.group_by{|klass, checkup| checkup.group}.map do |group, checkups|
-        puts "#{!first ? "\n\n" : ''}#{'#' * 30}\n### #{group.capitalize} checks"
+        puts "#{group == :general ? "\n" : "\n\n"}#{'#' * 30}\n### #{group.capitalize} checks"
         first = false
 
         checkups.each do |klass, checkup|
-          if diagnosis = checkup.check
+          if diagnosis = checkup.check(verbose: verbose)
             errcount += diagnosis.errors.count
             warcount += diagnosis.warnings.count
             diagnosis.put_results
