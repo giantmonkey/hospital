@@ -72,7 +72,6 @@ module Hospital
         p e
       end
 
-      p "printing results"
       @@checkups.group_by{|klass, checkup| checkup.group}.map do |group, checkups|
         puts "#{group == :general ? "\n" : "\n\n"}#{'#' * 30}\n### #{group.capitalize} checks"
         first = false
