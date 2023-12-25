@@ -2,7 +2,7 @@ class Hospital::Diagnosis
   attr_reader :infos, :warnings, :errors, :name, :results
 
   def initialize name
-    @name               = name.to_s
+    @name = name.to_s
     reset
   end
 

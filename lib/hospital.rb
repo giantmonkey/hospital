@@ -11,12 +11,12 @@ module Hospital
   class Checkup 
     attr_reader :code, :condition, :diagnosis, :group
 
-    def initialize klass, code, group: :general, condition: -> { true }
+    def initialize klass, code, group: :general, title: nil, condition: -> { true }
       @klass      = klass
       @code       = code
       @group      = group
       @condition  = condition
-      @diagnosis  = Hospital::Diagnosis.new(klass)
+      @diagnosis  = Hospital::Diagnosis.new([klass.to_s, title].compact.join(' - '))
     end
 
     def reset_diagnosis
@@ -55,15 +55,30 @@ module Hospital
     end
 
     def do_checkup_all verbose: false
-      errcount = 0
-      warcount = 0
+      errcount  = 0
+      warcount  = 0
+      threads   = []
 
+      @@checkups.each do |klass, checkup|
+        threads << Thread.new do
+          Thread.current.report_on_exception = false
+          checkup.check(verbose: verbose)
+        end
+      end
+
+      begin
+        threads.each &:join
+      rescue StandardError => e
+        p e
+      end
+
+      p "printing results"
       @@checkups.group_by{|klass, checkup| checkup.group}.map do |group, checkups|
         puts "#{group == :general ? "\n" : "\n\n"}#{'#' * 30}\n### #{group.capitalize} checks"
         first = false
 
         checkups.each do |klass, checkup|
-          if diagnosis = checkup.check(verbose: verbose)
+          if diagnosis = checkup.diagnosis
             errcount += diagnosis.errors.count
             warcount += diagnosis.warnings.count
             diagnosis.put_results
@@ -85,8 +100,8 @@ module Hospital
     end
   end
 
-  def checkup if: -> { true }, group: :general, &code
-    @@checkups[self] = Checkup.new self, code, group: group, condition: binding.local_variable_get('if')
+  def checkup if: -> { true }, group: :general, title: nil, &code
+    @@checkups[self] = Checkup.new self, code, group: group, title: title, condition: binding.local_variable_get('if')
   end
 
 end
