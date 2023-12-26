@@ -2,6 +2,9 @@
 
 require_relative "hospital/version"
 require_relative "hospital/diagnosis"
+require_relative "hospital/formatter"
+
+using Formatter
 
 module Hospital
   require_relative 'railtie' if defined?(Rails)
@@ -42,6 +45,7 @@ module Hospital
   @@checkups = {}
 
   class << self
+
     def included(klass)
       raise Hospital::Error.new("Cannot include Hospital, please extend instead.")
     end
@@ -67,7 +71,7 @@ module Hospital
       threads.each &:join
 
       @@checkups.group_by{|klass, checkup| checkup.group}.map do |group, checkups|
-        puts "#{group == :general ? "\n" : "\n\n"}#{'#' * 30}\n### #{group.capitalize} checks"
+        puts group_header(group)
         first = false
 
         checkups.each do |klass, checkup|
@@ -76,10 +80,10 @@ module Hospital
             warcount += diagnosis.warnings.count
 
             if !checkup.skipped
-              puts "\n### Checking #{diagnosis.name}:"
+              puts "Checking #{diagnosis.name}:".h2
               diagnosis.put_results
             elsif verbose
-              puts "\n### Skipped #{diagnosis.name}."
+              puts "Skipped #{diagnosis.name}.".h2
             end
           end
         end
@@ -87,15 +91,19 @@ module Hospital
 
       puts <<~END
 
-        ### Summary:
-        Errors:   #{errcount}
-        Warnings: #{warcount}
+        #{"Summary:".h1}
+        #{"Errors:   #{errcount}".red}
+        #{"Warnings: #{warcount}".yellow}
       END
     end
 
     # used to call the checkup for a specific class directly (in specs)
     def do_checkup(klass)
       @@checkups[klass].check
+    end
+
+    def group_header group
+      "### #{group.to_s.capitalize.gsub(/_/, ' ')} checks".h1
     end
   end
 
