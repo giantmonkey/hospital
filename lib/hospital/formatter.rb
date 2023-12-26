@@ -1,11 +1,19 @@
 module Formatter
   refine String do
+    def bold
+      "\e[1m#{self}\e[0m"
+    end
+
+    def underline
+      "\e[4m#{self}\e[0m"
+    end
+
     def h1
-      "\n\e[4m\e[1m#{self}\e[0m"
+      "\n#{self}".underline.bold
     end
 
     def h2
-      "\n\e[4m#{self}\e[0m"
+      "\n#{self}".underline
     end
 
     def red
