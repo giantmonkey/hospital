@@ -9,7 +9,7 @@ module Hospital
   class Error < StandardError; end
 
   class Checkup 
-    attr_reader :code, :condition, :diagnosis, :group
+    attr_reader :code, :condition, :diagnosis, :group, :skipped, :klass
 
     def initialize klass, code, group: :general, title: nil, condition: -> { true }
       @klass      = klass
@@ -27,16 +27,15 @@ module Hospital
       diagnosis.reset
 
       if condition.nil? || condition.call
+        @skipped = false
         code.call(diagnosis)
         diagnosis
       else
-        if verbose
-          diagnosis.add_info 'Skipped because condition not met.'
-          diagnosis
-        else
-          nil
-        end
+        @skipped = true
+        nil
       end
+    rescue StandardError => e
+      diagnosis.add_error "Unrescued exception in #{klass}.checkup:\n#{e.inspect}.\nThis is a bug inside the checkup method that should be fixed!"
     end
   end
 
@@ -57,20 +56,15 @@ module Hospital
     def do_checkup_all verbose: false
       errcount  = 0
       warcount  = 0
-      threads   = []
 
-      @@checkups.each do |klass, checkup|
-        threads << Thread.new do
+      threads = @@checkups.map do |klass, checkup|
+        Thread.new do
           Thread.current.report_on_exception = false
           checkup.check(verbose: verbose)
         end
       end
 
-      begin
-        threads.each &:join
-      rescue StandardError => e
-        p e
-      end
+      threads.each &:join
 
       @@checkups.group_by{|klass, checkup| checkup.group}.map do |group, checkups|
         puts "#{group == :general ? "\n" : "\n\n"}#{'#' * 30}\n### #{group.capitalize} checks"
@@ -80,7 +74,13 @@ module Hospital
           if diagnosis = checkup.diagnosis
             errcount += diagnosis.errors.count
             warcount += diagnosis.warnings.count
-            diagnosis.put_results
+
+            if !checkup.skipped
+              puts "\n### Checking #{diagnosis.name}:"
+              diagnosis.put_results
+            elsif verbose
+              puts "\n### Skipped #{diagnosis.name}."
+            end
           end
         end
       end

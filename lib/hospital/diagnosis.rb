@@ -80,15 +80,6 @@ class Hospital::Diagnosis
   end
 
   def put_results
-    put_header "Checking #{name}:"
     results.each &:put
   end
-
-  private
-
-  def put_header message
-    puts ''
-    puts "### #{message}"
-  end
-
 end
