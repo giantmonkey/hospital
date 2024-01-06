@@ -4,6 +4,7 @@ require "byebug"
 require_relative "hospital/version"
 require_relative "hospital/diagnosis"
 require_relative "hospital/formatter"
+require_relative "hospital/fake_thread"
 
 using Formatter
 
@@ -60,14 +61,9 @@ module Hospital
       errcount  = 0
       warcount  = 0
 
-      threads = @@checkups.keys.map do |klass|
-        Thread.new do
-          Thread.current.report_on_exception = false
-          do_checkup(klass, verbose: verbose)
-        end
+      @@checkups.keys.map do |klass|
+        do_checkup(klass, verbose: verbose)
       end
-
-      threads.each &:join
 
       @@checkups.values.flatten.group_by(&:group).map do |group, checkups|
         puts group_header(group)
@@ -111,6 +107,14 @@ module Hospital
 
     def group_header group
       "### #{group.to_s.capitalize.gsub(/_/, ' ')} checks".h1
+    end
+
+    def thread_class= klass
+      @@thread_class = klass
+    end
+
+    def thread_class
+      @@thread_class || Thread
     end
   end
 
