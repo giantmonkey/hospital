@@ -1,3 +1,7 @@
+require_relative "formatter"
+
+using Formatter
+
 class Hospital::Diagnosis  
   attr_reader :infos, :warnings, :errors, :name, :results
 
@@ -45,7 +49,7 @@ class Hospital::Diagnosis
     end
 
     def put 
-      puts output
+      puts output.indented
     end
   end
 
@@ -54,11 +58,11 @@ class Hospital::Diagnosis
   end
 
   class Warning < Result
-    def prefix; '🟠'; end
+    def prefix; '🟠' end
   end
 
   class Error < Result
-    def prefix; '🔴'; end
+    def prefix; '🔴' end
   end
 
   def add_info message
@@ -81,5 +85,11 @@ class Hospital::Diagnosis
 
   def put_results
     results.each &:put
+  end
+
+  def on_success_message message
+    if errors.count == 0
+      add_info message
+    end
   end
 end

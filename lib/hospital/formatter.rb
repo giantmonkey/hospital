@@ -23,5 +23,9 @@ module Formatter
     def yellow
       "\e[33m#{self}\e[0m"
     end
+
+    def indented
+      "#{self}"
+    end
   end
 end

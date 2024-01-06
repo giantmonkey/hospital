@@ -80,10 +80,10 @@ module Hospital
             warcount += diagnosis.warnings.count
 
             if !checkup.skipped
-              puts "Checking #{diagnosis.name}:".h2
+              puts "Checking #{diagnosis.name}:".h2.indented
               diagnosis.put_results
             elsif verbose
-              puts "Skipped #{diagnosis.name}.".h2
+              puts "Skipped #{diagnosis.name}.".h2.indented
             end
           end
         end
