@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'byebug'
+
 class Patient
   extend Hospital
 
@@ -42,6 +44,22 @@ class Patient4
   def self.check_check; end
 end
 
+class PatientMultiple
+  extend Hospital
+
+  checkup do |d|
+    check_check1
+  end
+
+  checkup do |d|
+    check_check2
+  end
+
+  def self.check_check1; end
+  def self.check_check2; end
+
+end
+
 RSpec.describe Hospital do
   it "has a version number" do
     expect(Hospital::VERSION).not_to be nil
@@ -49,22 +67,22 @@ RSpec.describe Hospital do
 
   describe Hospital do
     it "returns a warning if checkup not overwritten" do
-      diagnosis = Hospital.do_checkup(Patient)
+      diagnosis = Hospital.do_checkup(Patient).first
       expect(diagnosis.warnings.map &:message).to eq ['Patient: No checks defined! Please call checkup with a lambda.']
     end
 
     it "returns checkups warnings if checkup overwritten" do
-      diagnosis = Hospital.do_checkup(Patient2)
+      diagnosis = Hospital.do_checkup(Patient2).first
       expect(diagnosis.warnings.map &:message).to eq ['Something is strange.']
     end
 
     it 'has the class name in the diagnosis' do
-      diagnosis = Hospital.do_checkup(Patient2)
+      diagnosis = Hospital.do_checkup(Patient2).first
       expect(diagnosis.name).to eq 'Patient2'
     end
 
     it 'executes require_env_vars method on the diagnosis' do
-      diagnosis = Hospital.do_checkup(Patient3)
+      diagnosis = Hospital.do_checkup(Patient3).first
       expect(diagnosis.errors.map &:message).to eq [
         "Something is VERY wrong.",
         "These necessary ENV vars are not set: ['MAMA']."
@@ -93,6 +111,15 @@ RSpec.describe Hospital do
         end
 
         Hospital.do_checkup_all
+      end
+    end
+
+    describe 'multiple checkups' do
+      it 'runs them all' do
+        expect(PatientMultiple).to receive(:check_check1)
+        expect(PatientMultiple).to receive(:check_check2)
+
+        diagnosis = Hospital.do_checkup(PatientMultiple)
       end
     end
   end

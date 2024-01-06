@@ -1,0 +1,33 @@
+current directory: /Users/aljoscha/gem-own/hospital/vendor/bundle/ruby/2.7.0/gems/debugger-1.6.8/ext/ruby_debug
+/Users/aljoscha/.asdf/installs/ruby/2.7.8/bin/ruby -I /Users/aljoscha/.asdf/installs/ruby/2.7.8/lib/ruby/2.7.0 -r ./siteconf20240106-62783-1bsfotq.rb extconf.rb
+*** extconf.rb failed ***
+Could not create Makefile due to some reason, probably lack of necessary
+libraries and/or headers.  Check the mkmf.log file for more details.  You may
+need configuration options.
+
+Provided configuration options:
+	--with-opt-dir
+	--without-opt-dir
+	--with-opt-include
+	--without-opt-include=${opt-dir}/include
+	--with-opt-lib
+	--without-opt-lib=${opt-dir}/lib
+	--with-make-prog
+	--without-make-prog
+	--srcdir=.
+	--curdir
+	--ruby=/Users/aljoscha/.asdf/installs/ruby/2.7.8/bin/$(RUBY_BASE_NAME)
+/Users/aljoscha/.asdf/installs/ruby/2.7.8/lib/ruby/2.7.0/fileutils.rb:1414:in `initialize': No such file or directory @ rb_sysopen - ./278/ruby_debug.h (Errno::ENOENT)
+	from /Users/aljoscha/.asdf/installs/ruby/2.7.8/lib/ruby/2.7.0/fileutils.rb:1414:in `open'
+	from /Users/aljoscha/.asdf/installs/ruby/2.7.8/lib/ruby/2.7.0/fileutils.rb:1414:in `copy_file'
+	from /Users/aljoscha/.asdf/installs/ruby/2.7.8/lib/ruby/2.7.0/fileutils.rb:511:in `copy_file'
+	from /Users/aljoscha/.asdf/installs/ruby/2.7.8/lib/ruby/2.7.0/fileutils.rb:430:in `block in cp'
+	from /Users/aljoscha/.asdf/installs/ruby/2.7.8/lib/ruby/2.7.0/fileutils.rb:1589:in `block in fu_each_src_dest'
+	from /Users/aljoscha/.asdf/installs/ruby/2.7.8/lib/ruby/2.7.0/fileutils.rb:1603:in `fu_each_src_dest0'
+	from /Users/aljoscha/.asdf/installs/ruby/2.7.8/lib/ruby/2.7.0/fileutils.rb:1587:in `fu_each_src_dest'
+	from /Users/aljoscha/.asdf/installs/ruby/2.7.8/lib/ruby/2.7.0/fileutils.rb:429:in `cp'
+	from extconf.rb:83:in `block in <main>'
+	from extconf.rb:82:in `each'
+	from extconf.rb:82:in `<main>'
+
+extconf failed, exit code 1

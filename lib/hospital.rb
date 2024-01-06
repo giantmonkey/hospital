@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "byebug"
 require_relative "hospital/version"
 require_relative "hospital/diagnosis"
 require_relative "hospital/formatter"
@@ -11,7 +12,7 @@ module Hospital
 
   class Error < StandardError; end
 
-  class Checkup 
+  class Checkup
     attr_reader :code, :condition, :diagnosis, :group, :skipped, :klass
 
     def initialize klass, code, group: :general, title: nil, condition: -> { true }
@@ -52,29 +53,27 @@ module Hospital
 
     def extended(klass)
       # only relevant if the class does not yet define a real checkup method
-      @@checkups[klass] = Checkup.new klass, -> (diagnosis) do
-        diagnosis.add_warning("#{klass}: No checks defined! Please call checkup with a lambda.")
-      end, group: :general
+      @@checkups[klass] = []
     end
 
     def do_checkup_all verbose: false
       errcount  = 0
       warcount  = 0
 
-      threads = @@checkups.map do |klass, checkup|
+      threads = @@checkups.keys.map do |klass|
         Thread.new do
           Thread.current.report_on_exception = false
-          checkup.check(verbose: verbose)
+          do_checkup(klass, verbose: verbose)
         end
       end
 
       threads.each &:join
 
-      @@checkups.group_by{|klass, checkup| checkup.group}.map do |group, checkups|
+      @@checkups.values.flatten.group_by(&:group).map do |group, checkups|
         puts group_header(group)
         first = false
 
-        checkups.each do |klass, checkup|
+        checkups.each do |checkup|
           if diagnosis = checkup.diagnosis
             errcount += diagnosis.errors.count
             warcount += diagnosis.warnings.count
@@ -98,8 +97,16 @@ module Hospital
     end
 
     # used to call the checkup for a specific class directly (in specs)
-    def do_checkup(klass)
-      @@checkups[klass].check
+    def do_checkup(klass, verbose: false)
+      if @@checkups[klass].length > 0
+        @@checkups[klass].map do |cu|
+          cu.check verbose: verbose
+        end
+      else
+        diagnosis = Diagnosis.new(klass)
+        diagnosis.add_warning("#{klass}: No checks defined! Please call checkup with a lambda.")
+        [ diagnosis ]
+      end
     end
 
     def group_header group
@@ -108,7 +115,13 @@ module Hospital
   end
 
   def checkup if: -> { true }, group: :general, title: nil, &code
-    @@checkups[self] = Checkup.new self, code, group: group, title: title, condition: binding.local_variable_get('if')
+    @@checkups[self] ||= []
+    @@checkups[self] << Checkup.new(
+      self,
+      code,
+      group: group,
+      title: title,
+      condition: binding.local_variable_get('if')
+    )
   end
-
 end
