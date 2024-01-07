@@ -4,7 +4,6 @@ require "byebug"
 require_relative "hospital/version"
 require_relative "hospital/diagnosis"
 require_relative "hospital/formatter"
-require_relative "hospital/fake_thread"
 
 using Formatter
 
