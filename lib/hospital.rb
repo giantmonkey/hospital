@@ -2,6 +2,8 @@
 
 require "byebug"
 require_relative "hospital/version"
+require_relative "hospital/checkup"
+require_relative "hospital/checkup_group"
 require_relative "hospital/diagnosis"
 require_relative "hospital/formatter"
 
@@ -12,38 +14,7 @@ module Hospital
 
   class Error < StandardError; end
 
-  class Checkup
-    attr_reader :code, :condition, :diagnosis, :group, :skipped, :klass
-
-    def initialize klass, code, group: :general, title: nil, condition: -> { true }
-      @klass      = klass
-      @code       = code
-      @group      = group
-      @condition  = condition
-      @diagnosis  = Hospital::Diagnosis.new([klass.to_s, title].compact.join(' - '))
-    end
-
-    def reset_diagnosis
-      diagnosis.reset
-    end
-
-    def check verbose: false
-      diagnosis.reset
-
-      if condition.nil? || condition.call
-        @skipped = false
-        code.call(diagnosis)
-        diagnosis
-      else
-        @skipped = true
-        nil
-      end
-    rescue StandardError => e
-      diagnosis.add_error "Unrescued exception in #{klass}.checkup:\n#{e.full_message}.\nThis is a bug inside the checkup method that should be fixed!"
-    end
-  end
-
-  @@checkups = {}
+  @@groups = []
 
   class << self
 
@@ -51,24 +22,15 @@ module Hospital
       raise Hospital::Error.new("Cannot include Hospital, please extend instead.")
     end
 
-    def extended(klass)
-      # only relevant if the class does not yet define a real checkup method
-      @@checkups[klass] = []
-    end
-
     def do_checkup_all verbose: false
       errcount  = 0
       warcount  = 0
 
-      @@checkups.keys.map do |klass|
-        do_checkup(klass, verbose: verbose)
-      end
+      @@groups.each do |group|
+        puts group.header
+        group.run_checkups verbose: verbose
 
-      @@checkups.values.flatten.group_by(&:group).map do |group, checkups|
-        puts group_header(group)
-        first = false
-
-        checkups.each do |checkup|
+        group.all_checkups.each do |checkup|
           if diagnosis = checkup.diagnosis
             errcount += diagnosis.errors.count
             warcount += diagnosis.warnings.count
@@ -91,40 +53,27 @@ module Hospital
       END
     end
 
-    # used to call the checkup for a specific class directly (in specs)
-    def do_checkup(klass, verbose: false)
-      if @@checkups[klass].length > 0
-        @@checkups[klass].map do |cu|
-          cu.check verbose: verbose
-        end
-      else
-        diagnosis = Diagnosis.new(klass)
-        diagnosis.add_warning("#{klass}: No checks defined! Please call checkup with a lambda.")
-        [ diagnosis ]
+    def find_or_create_checkup_group name
+      unless checkup_group = @@groups.detect{|g| g.name == name }
+        checkup_group = CheckupGroup.new name
+        @@groups << checkup_group
       end
-    end
-
-    def group_header group
-      "### #{group.to_s.capitalize.gsub(/_/, ' ')} checks".h1
-    end
-
-    def thread_class= klass
-      @@thread_class = klass
-    end
-
-    def thread_class
-      @@thread_class || Thread
+      checkup_group
     end
   end
 
-  def checkup if: -> { true }, group: :general, title: nil, &code
-    @@checkups[self] ||= []
-    @@checkups[self] << Checkup.new(
+  def checkup if: -> { true }, group: :general, title: nil, precondition: false, &code
+    checkup_group = Hospital.find_or_create_checkup_group group
+    checkup = Checkup.new(
       self,
       code,
-      group: group,
-      title: title,
-      condition: binding.local_variable_get('if')
+      group:        group,
+      title:        title,
+      condition:    binding.local_variable_get('if'),
+      precondition: precondition
     )
+
+    # p "adding #{checkup.inspect} to #{group}"
+    checkup_group.add_checkup checkup
   end
 end

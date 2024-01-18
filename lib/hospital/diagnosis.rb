@@ -2,8 +2,8 @@ require_relative "formatter"
 
 using Formatter
 
-class Hospital::Diagnosis  
-  attr_reader :infos, :warnings, :errors, :name, :results
+class Hospital::Diagnosis
+  attr_reader :infos, :warnings, :skips, :errors, :name, :results
 
   def initialize name
     @name = name.to_s
@@ -13,6 +13,7 @@ class Hospital::Diagnosis
   def reset
     @infos    = []
     @warnings = []
+    @skips    = []
     @errors   = []
     @results  = []
   end
@@ -48,7 +49,7 @@ class Hospital::Diagnosis
       "#{prefix} #{message.gsub(/\n\z/, '').gsub(/\n/, prefix ? "\n   " : "\n")}"
     end
 
-    def put 
+    def put
       puts output.indented
     end
   end
@@ -58,6 +59,10 @@ class Hospital::Diagnosis
   end
 
   class Warning < Result
+    def prefix; '🟠' end
+  end
+
+  class Skip < Result
     def prefix; '🟠' end
   end
 
@@ -77,6 +82,12 @@ class Hospital::Diagnosis
     @results  << warning
   end
 
+  def add_skip message
+    skip = Skip.new message
+    @skips    << skip
+    @results  << skip
+  end
+
   def add_error message
     error = Error.new message
     @errors   << error
@@ -87,8 +98,12 @@ class Hospital::Diagnosis
     results.each &:put
   end
 
+  def success?
+    errors.count == 0 && skips.count == 0
+  end
+
   def on_success_message message
-    if errors.count == 0
+    if success?
       add_info message
     end
   end

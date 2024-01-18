@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
-require "hospital"
+require     'byebug'
+require     'require_all'
+require     'hospital'
+require_all 'lib/hospital'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
