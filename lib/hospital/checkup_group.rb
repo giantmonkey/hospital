@@ -4,13 +4,13 @@ using Formatter
 
 module Hospital
   class CheckupGroup
-    attr_reader :name, :checkups, :precondition_checkups
+    attr_reader :name, :checkups, :precondition_checkups, :skipped
 
     def initialize name
       @name                   = name
       @precondition_checkups  = []
       @checkups               = []
-      @preconditions_met      = true
+      @skipped                = false
     end
 
     def all_checkups
@@ -32,7 +32,7 @@ module Hospital
     def run_checkups verbose: false
       run_precondition_checkups verbose: verbose
 
-      if @preconditions_met
+      unless @skipped
         run_dependent_checkups verbose: verbose
       end
     end
@@ -40,7 +40,7 @@ module Hospital
     def run_precondition_checkups verbose: false
       @precondition_checkups.each do |checkup|
         checkup.check verbose: verbose
-        @preconditions_met = false unless checkup.success?
+        @skipped = true unless checkup.success?
       end
     end
 

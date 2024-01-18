@@ -53,6 +53,13 @@ module Hospital
       END
     end
 
+    # used to call the checkup for a specific class directly (in specs)
+    def do_checkup(klass, verbose: false)
+      @@groups.map(&:all_checkups).flatten.select{|cu| cu.klass == klass }.map do |cu|
+        cu.check verbose: verbose
+      end
+    end
+
     def find_or_create_checkup_group name
       unless checkup_group = @@groups.detect{|g| g.name == name }
         checkup_group = CheckupGroup.new name
