@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 require "byebug"
+require          'require_all'
 require_relative "hospital/version"
 require_relative "hospital/checkup"
 require_relative "hospital/checkup_group"
 require_relative "hospital/diagnosis"
 require_relative "hospital/formatter"
+require_relative "hospital/formatter/shell"
 
 using Formatter
 
@@ -22,12 +24,14 @@ module Hospital
       raise Hospital::Error.new("Cannot include Hospital, please extend instead.")
     end
 
-    def do_checkup_all verbose: false
+    def do_checkup_all verbose: false, formatter: Formatter::Shell
+      out = formatter.new
+
       errcount  = 0
       warcount  = 0
 
       @@groups.each do |group|
-        puts group.header
+        out.put_group_header group.header
         group.run_checkups verbose: verbose
 
         group.all_checkups.each do |checkup|
@@ -45,12 +49,9 @@ module Hospital
         end
       end
 
-      puts <<~END
+      out.put_summary errcount, warcount
 
-        #{"Summary:".h1}
-        #{"Errors:   #{errcount}".red}
-        #{"Warnings: #{warcount}".yellow}
-      END
+      out.buffer
     end
 
     # used to call the checkup for a specific class directly (in specs)

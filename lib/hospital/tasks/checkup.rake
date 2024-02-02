@@ -13,5 +13,5 @@ task :doctor, [:verbose] => :environment do |t, args|
   end
 
   p "start checkup" if verbose
-  Hospital.do_checkup_all verbose: verbose
+  puts Hospital.do_checkup_all verbose: verbose
 end
