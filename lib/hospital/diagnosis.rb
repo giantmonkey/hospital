@@ -49,8 +49,8 @@ class Hospital::Diagnosis
       "#{prefix} #{message.gsub(/\n\z/, '').gsub(/\n/, prefix ? "\n   " : "\n")}"
     end
 
-    def put
-      puts output.indented
+    def put out
+      out.put_diagnosis_result output
     end
   end
 
@@ -94,8 +94,10 @@ class Hospital::Diagnosis
     @results  << error
   end
 
-  def put_results
-    results.each &:put
+  def put_results out
+    results.each do |result|
+      result.put out
+    end
   end
 
   def success?

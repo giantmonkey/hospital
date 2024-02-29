@@ -2,6 +2,10 @@
 
 require_relative '../../hospital'
 
+# usage:
+# rake doctor
+# rake doctor[true]
+
 desc 'Check system setup sanity.'
 task :doctor, [:verbose] => :environment do |t, args|
   verbose = args[:verbose] == "true"

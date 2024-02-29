@@ -22,6 +22,8 @@ module Hospital
     end
 
     def add_checkup checkup
+      checkup.set_group self
+
       if checkup.precondition
         @precondition_checkups << checkup
       else

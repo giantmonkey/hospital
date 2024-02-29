@@ -4,13 +4,13 @@ module Hospital
   class Checkup
     attr_reader :code, :condition, :diagnosis, :group, :skipped, :klass, :precondition
 
-    def initialize klass, code, group: :general, title: nil, condition: -> { true }, precondition: false
+    def initialize klass, code, title: nil, condition: -> { true }, precondition: false
       @klass        = klass
       @code         = code
-      @group        = group
       @condition    = condition
       @diagnosis    = Hospital::Diagnosis.new([klass.to_s, title].compact.join(' - '))
       @precondition = precondition
+      @group        = nil
     end
 
     def reset_diagnosis
@@ -34,6 +34,10 @@ module Hospital
 
     def success?
       diagnosis.success?
+    end
+
+    def set_group group
+      @group = group
     end
   end
 end

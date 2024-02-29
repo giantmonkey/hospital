@@ -6,9 +6,9 @@ RSpec.describe Hospital::CheckupGroup do
   let (:success)          { -> (d) { d.add_info 'nice!'} }
   let (:failure)          { -> (d) { d.add_error 'fail!'} }
   let (:group)            { Hospital::CheckupGroup.new :test }
-  let (:checkup_normal)   { Hospital::Checkup.new(Object, success, group: :test) }
-  let (:checkup_pre)      { Hospital::Checkup.new(Object, success, group: :test, precondition: true) }
-  let (:checkup_pre_fail) { Hospital::Checkup.new(Object, failure, group: :test, precondition: true) }
+  let (:checkup_normal)   { Hospital::Checkup.new(Object, success) }
+  let (:checkup_pre)      { Hospital::Checkup.new(Object, success, precondition: true) }
+  let (:checkup_pre_fail) { Hospital::Checkup.new(Object, failure, precondition: true) }
 
   before do
     group.add_checkup checkup_normal

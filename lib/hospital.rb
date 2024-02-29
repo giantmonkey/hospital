@@ -49,13 +49,12 @@ module Hospital
     checkup = Checkup.new(
       self,
       code,
-      group:        group,
       title:        title,
       condition:    binding.local_variable_get('if'),
       precondition: precondition
     )
 
-    # p "adding #{checkup.inspect} to #{group}"
+    # p "adding #{checkup.inspect} to #{group_name}"
     checkup_group.add_checkup checkup
   end
 
@@ -82,11 +81,11 @@ module Hospital
             errcount += diagnosis.errors.count
             warcount += diagnosis.warnings.count
 
-            if !checkup.skipped
-              out.put_diagnosis_header "Checking #{diagnosis.name}:".h2.indented
-              diagnosis.put_results
+            if !checkup.skipped && (!checkup.group.skipped || checkup.precondition)
+              out.put_diagnosis_header "Checking #{diagnosis.name}:"
+              diagnosis.put_results out
             elsif verbose
-              out.put_diagnosis_header "Skipped #{diagnosis.name}.".h2.indented
+              out.put_diagnosis_header "Skipped #{diagnosis.name}."
             end
           end
         end
@@ -96,6 +95,5 @@ module Hospital
 
       out.buffer
     end
-
   end
 end

@@ -10,7 +10,7 @@ module Hospital
       end
 
       def put_diagnosis_header text
-        @buffer << text
+        @buffer << "\n#{text.h2.indented}"
       end
 
       def put_summary errors_count, warnings_count
@@ -20,6 +20,10 @@ module Hospital
           #{"Errors:   #{errors_count}".red}
           #{"Warnings: #{warnings_count}".yellow}
         END
+      end
+
+      def put_diagnosis_result text
+        @buffer << "\n#{text.indented}"
       end
 
     end
