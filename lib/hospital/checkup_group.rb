@@ -1,6 +1,6 @@
-require_relative "formatter"
+require_relative "string_formatter"
 
-using Formatter
+using StringFormatter
 
 module Hospital
   class CheckupGroup

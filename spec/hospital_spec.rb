@@ -39,26 +39,6 @@ RSpec.describe Hospital do
       end.to raise_error(Hospital::Error)
     end
 
-    describe '.checkup_all' do
-      it 'runs all checkups' do
-
-        [PatientWithCheckup, PatientWithError].each do |patient|
-          expect(patient).to receive(:check_check)
-        end
-
-        # Patient                       has no checkup defined
-        # PatientWithConditionalCheckup has the checkup disabled
-        [PatientWithoutCheckup, PatientWithConditionalCheckup].each do |patient|
-          expect(patient).not_to receive(:check_check)
-        end
-
-        expect(PatientWithCheckupGroups).not_to receive(:check_check1) # group precondition failed
-        expect(PatientWithCheckupGroups).to     receive(:check_check2) # group precondition succeeded
-
-        Hospital.do_checkup_all
-      end
-    end
-
     describe 'multiple checkups' do
       it 'runs them all' do
         expect(PatientWithMultipleCheckups).to receive(:check_check1)

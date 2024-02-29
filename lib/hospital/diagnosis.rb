@@ -1,6 +1,6 @@
-require_relative "formatter"
+require_relative "string_formatter"
 
-using Formatter
+using StringFormatter
 
 class Hospital::Diagnosis
   attr_reader :infos, :warnings, :skips, :errors, :name, :results

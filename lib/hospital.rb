@@ -6,10 +6,10 @@ require_relative "hospital/version"
 require_relative "hospital/checkup"
 require_relative "hospital/checkup_group"
 require_relative "hospital/diagnosis"
-require_relative "hospital/formatter"
+require_relative "hospital/string_formatter"
 require_relative "hospital/formatter/shell"
 
-using Formatter
+using StringFormatter
 
 module Hospital
   require_relative 'railtie' if defined?(Rails)
@@ -22,36 +22,6 @@ module Hospital
 
     def included(klass)
       raise Hospital::Error.new("Cannot include Hospital, please extend instead.")
-    end
-
-    def do_checkup_all verbose: false, formatter: Formatter::Shell
-      out = formatter.new
-
-      errcount  = 0
-      warcount  = 0
-
-      @@groups.each do |group|
-        out.put_group_header group.header
-        group.run_checkups verbose: verbose
-
-        group.all_checkups.each do |checkup|
-          if diagnosis = checkup.diagnosis
-            errcount += diagnosis.errors.count
-            warcount += diagnosis.warnings.count
-
-            if !checkup.skipped
-              puts "Checking #{diagnosis.name}:".h2.indented
-              diagnosis.put_results
-            elsif verbose
-              puts "Skipped #{diagnosis.name}.".h2.indented
-            end
-          end
-        end
-      end
-
-      out.put_summary errcount, warcount
-
-      out.buffer
     end
 
     # used to call the checkup for a specific class directly (in specs)
@@ -68,6 +38,10 @@ module Hospital
       end
       checkup_group
     end
+
+    def groups
+      @@groups
+    end
   end
 
   def checkup if: -> { true }, group: :general, title: nil, precondition: false, &code
@@ -83,5 +57,45 @@ module Hospital
 
     # p "adding #{checkup.inspect} to #{group}"
     checkup_group.add_checkup checkup
+  end
+
+  class Runner
+    attr_reader :verbose
+
+    def initialize verbose: false, formatter: Formatter::Shell
+      @verbose    = verbose
+      @formatter  = formatter
+    end
+
+    def do_checkup_all
+      out = @formatter.new
+
+      errcount  = 0
+      warcount  = 0
+
+      Hospital.groups.each do |group|
+        out.put_group_header group.header
+        group.run_checkups verbose: verbose
+
+        group.all_checkups.each do |checkup|
+          if diagnosis = checkup.diagnosis
+            errcount += diagnosis.errors.count
+            warcount += diagnosis.warnings.count
+
+            if !checkup.skipped
+              out.put_diagnosis_header "Checking #{diagnosis.name}:".h2.indented
+              diagnosis.put_results
+            elsif verbose
+              out.put_diagnosis_header "Skipped #{diagnosis.name}.".h2.indented
+            end
+          end
+        end
+      end
+
+      out.put_summary errcount, warcount
+
+      out.buffer
+    end
+
   end
 end

@@ -1,4 +1,4 @@
-module Formatter
+module StringFormatter
   refine String do
     def bold
       "\e[1m#{self}\e[0m"
