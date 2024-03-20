@@ -8,6 +8,7 @@ require_relative "hospital/checkup_group"
 require_relative "hospital/diagnosis"
 require_relative "hospital/string_formatter"
 require_relative "hospital/formatter/shell"
+require_relative "hospital/formatter/pre"
 
 using StringFormatter
 
@@ -61,19 +62,23 @@ module Hospital
   class Runner
     attr_reader :verbose
 
-    def initialize verbose: false, formatter: Formatter::Shell
+    def initialize verbose: false, formatter: :shell
       @verbose    = verbose
-      @formatter  = formatter
+      @formatter  = case formatter
+        when :pre then Formatter::Pre
+        else           Formatter::Shell
+      end
+
+      @out = @formatter.new
+      # @out.put_group_header "using formatter #{@formatter}"
     end
 
     def do_checkup_all
-      out = @formatter.new
-
       errcount  = 0
       warcount  = 0
 
       Hospital.groups.each do |group|
-        out.put_group_header group.header
+        @out.put_group_header group.header
         group.run_checkups verbose: verbose
 
         group.all_checkups.each do |checkup|
@@ -82,18 +87,18 @@ module Hospital
             warcount += diagnosis.warnings.count
 
             if !checkup.skipped && (!checkup.group.skipped || checkup.precondition)
-              out.put_diagnosis_header "Checking #{diagnosis.name}:"
-              diagnosis.put_results out
+              @out.put_diagnosis_header "Checking #{diagnosis.name}:"
+              diagnosis.put_results @out
             elsif verbose
-              out.put_diagnosis_header "Skipped #{diagnosis.name}."
+              @out.put_diagnosis_header "Skipped #{diagnosis.name}."
             end
           end
         end
       end
 
-      out.put_summary errcount, warcount
+      @out.put_summary errcount, warcount
 
-      out.buffer
+      @out.buffer
     end
   end
 end

@@ -4,26 +4,26 @@ using StringFormatter
 
 module Hospital
   module Formatter
-    class Shell < Base
+    class Pre < Base
       def put_group_header text
-        @buffer << "\n### #{text}".h1
+        @buffer << "\n\n### #{text}"
       end
 
       def put_diagnosis_header text
-        @buffer << "\n#{text.h2.indented}"
+        @buffer << "\n\n## #{text}"
       end
 
       def put_summary errors_count, warnings_count
         @buffer <<  <<~END
-
-          #{"Summary:".h1}
-          #{"Errors:   #{errors_count}".red}
-          #{"Warnings: #{warnings_count}".yellow}
+          \n\n
+          #### #{"Summary:"}
+          #{"Errors:   #{errors_count}"}
+          #{"Warnings: #{warnings_count}"}
         END
       end
 
       def put_diagnosis_result text
-        @buffer << "\n#{text.indented}"
+        @buffer << "\n#{text}"
       end
 
     end

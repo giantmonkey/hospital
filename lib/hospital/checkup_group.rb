@@ -18,7 +18,7 @@ module Hospital
     end
 
     def header
-      "\n### #{name.to_s.capitalize.gsub(/_/, ' ')} checks".h1
+      "#{name.to_s.capitalize.gsub(/_/, ' ')} checks"
     end
 
     def add_checkup checkup
