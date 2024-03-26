@@ -16,9 +16,9 @@ module Hospital
       def put_summary errors_count, warnings_count
         @buffer <<  <<~END
           \n\n
-          #### #{"Summary:"}
-          #{"Errors:   #{errors_count}"}
-          #{"Warnings: #{warnings_count}"}
+          #### Summary:
+          Errors:   #{errors_count}
+          Warnings: #{warnings_count}
         END
       end
 
