@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    hospital (0.7.0)
+    hospital (0.7.1)
       require_all
 
 GEM
