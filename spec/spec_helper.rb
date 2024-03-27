@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require     'byebug'
 require     'require_all'
 require     'hospital'
 require_all 'lib/hospital'

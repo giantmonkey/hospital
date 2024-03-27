@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "byebug"
-require          'require_all'
 require_relative "hospital/version"
 require_relative "hospital/checkup"
 require_relative "hospital/checkup_group"
