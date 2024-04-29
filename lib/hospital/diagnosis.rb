@@ -11,21 +11,33 @@ class Hospital::Diagnosis
   end
 
   def reset
-    @infos    = []
-    @warnings = []
-    @skips    = []
-    @errors   = []
-    @results  = []
+    @infos              = []
+    @warnings           = []
+    @skips              = []
+    @errors             = []
+    @results            = []
+
+    @required_env_vars  = []
   end
 
   def require_env_vars env_vars=[]
     success = true
+    @required_env_vars = env_vars
+
     if (missing_vars = env_vars.select{|var| ENV[var].nil? || ENV[var].empty? }).any?
       add_error("These necessary ENV vars are not set: #{variable_list(missing_vars)}.")
       success = false
     else
       add_info("All necessary ENV vars are set.")
     end
+  end
+
+  def dump_required_env_vars
+    @required_env_vars.map do |name|
+      value = ENV[name]
+      value = hide_value value if name =~ /(secret|password|key)/i
+      "'#{name}': #{value}"
+    end.join(",\n")
   end
 
   def variable_list vars
