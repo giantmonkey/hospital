@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    hospital (0.7.2)
+    hospital (0.7.3)
 
 GEM
   remote: https://rubygems.org/

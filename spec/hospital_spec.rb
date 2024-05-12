@@ -31,6 +31,13 @@ RSpec.describe Hospital do
       ]
     end
 
+    it 'allows for condition to be ignored' do
+      diagnosis = Hospital.do_checkup(PatientWithConditionalCheckup, ignore_condition: true).first
+      expect(diagnosis.warnings.map &:message).to eq [
+        "I should not be called :-)"
+      ]
+    end
+
     it 'makes sure it is not included' do
       expect do
         class Patty

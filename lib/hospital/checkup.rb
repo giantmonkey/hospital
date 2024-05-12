@@ -17,10 +17,10 @@ module Hospital
       diagnosis.reset
     end
 
-    def check verbose: false
+    def check verbose: false, ignore_condition: false
       diagnosis.reset
 
-      if condition.nil? || condition.call
+      if ignore_condition || condition.nil? || condition.call
         @skipped = false
         code.call(diagnosis)
         diagnosis

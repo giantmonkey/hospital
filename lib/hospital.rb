@@ -24,9 +24,9 @@ module Hospital
     end
 
     # used to call the checkup for a specific class directly (in specs)
-    def do_checkup(klass, verbose: false)
+    def do_checkup(klass, verbose: false, ignore_condition: false)
       @@groups.map(&:all_checkups).flatten.select{|cu| cu.klass == klass }.map do |cu|
-        cu.check verbose: verbose
+        cu.check verbose: verbose, ignore_condition: ignore_condition
       end
     end
 
