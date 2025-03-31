@@ -23,11 +23,10 @@ RSpec.describe Hospital::Runner do
     end
 
     describe 'Hash / JSON formatter' do
-      let (:runner) { Hospital::Runner.new(formatter: :hash) }
+      let (:runner) { Hospital::Runner.new(formatter: :raw) }
 
       it 'spits out JSON' do
         result = runner.do_checkup_all
-        p result
 
         expect(result['summary']['errors']).to eq 3
       end

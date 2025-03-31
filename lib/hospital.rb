@@ -7,7 +7,7 @@ require_relative "hospital/diagnosis"
 require_relative "hospital/string_formatter"
 require_relative "hospital/formatter/shell"
 require_relative "hospital/formatter/pre"
-require_relative "hospital/formatter/hash"
+require_relative "hospital/formatter/raw"
 
 using StringFormatter
 
@@ -64,9 +64,9 @@ module Hospital
     def initialize verbose: false, formatter: :shell
       @verbose    = verbose
       @formatter  = case formatter
-        when :pre   then  Formatter::Pre
-        when :hash  then  Formatter::Hash
-        else              Formatter::Shell
+        when :pre then  Formatter::Pre
+        when :raw then  Formatter::Raw
+        else            Formatter::Shell
       end
 
       @out = @formatter.new

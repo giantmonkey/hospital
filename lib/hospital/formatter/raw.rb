@@ -4,7 +4,7 @@ using StringFormatter
 
 module Hospital
   module Formatter
-    class Hash < Base
+    class Raw < Base
 
       def initialize
         @data = {}
