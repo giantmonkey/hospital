@@ -10,7 +10,11 @@ module Hospital
       end
 
       def put_diagnosis_header text
-        @buffer << "\n#{text.h2.indented}"
+        @buffer << "\nChecking #{text.h2.indented}"
+      end
+
+      def put_diagnosis_skipped text
+        @buffer << "\nSkipped #{text.h2.indented}"
       end
 
       def put_summary errors_count, warnings_count

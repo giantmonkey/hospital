@@ -63,8 +63,9 @@ module Hospital
     def initialize verbose: false, formatter: :shell
       @verbose    = verbose
       @formatter  = case formatter
-        when :pre then Formatter::Pre
-        else           Formatter::Shell
+        when :pre   then  Formatter::Pre
+        when :hash  then  Formatter::Hash
+        else              Formatter::Shell
       end
 
       @out = @formatter.new
@@ -85,10 +86,10 @@ module Hospital
             warcount += diagnosis.warnings.count
 
             if !checkup.skipped && (!checkup.group.skipped || checkup.precondition)
-              @out.put_diagnosis_header "Checking #{diagnosis.name}:"
+              @out.put_diagnosis_header "#{diagnosis.name}:"
               diagnosis.put_results @out
             elsif verbose
-              @out.put_diagnosis_header "Skipped #{diagnosis.name}."
+              @out.put_diagnosis_skipped "Skipped #{diagnosis.name}."
             end
           end
         end
@@ -96,7 +97,7 @@ module Hospital
 
       @out.put_summary errcount, warcount
 
-      @out.buffer
+      @out.result
     end
   end
 end
