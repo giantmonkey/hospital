@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_rel '../classes'
+
 RSpec.describe Hospital::Runner do
   let (:runner) { Hospital::Runner.new }
 
@@ -27,7 +29,6 @@ RSpec.describe Hospital::Runner do
 
       it 'spits out JSON' do
         result = runner.do_checkup_all
-
         expect(result['summary']['errors']).to eq 3
       end
     end
