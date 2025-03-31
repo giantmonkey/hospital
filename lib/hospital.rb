@@ -7,6 +7,7 @@ require_relative "hospital/diagnosis"
 require_relative "hospital/string_formatter"
 require_relative "hospital/formatter/shell"
 require_relative "hospital/formatter/pre"
+require_relative "hospital/formatter/hash"
 
 using StringFormatter
 
