@@ -5,7 +5,7 @@ using StringFormatter
 module Hospital
   module Formatter
     class Pre < Base
-      def put_group_headeresult
+      def put_group_header text
         @buffer << "\n\n### #{text}"
       end
 
@@ -26,8 +26,8 @@ module Hospital
         END
       end
 
-      def put_diagnosis_result text
-        @buffer << "\n#{text}"
+      def put_diagnosis_result result
+        @buffer << "\n#{result.output}"
       end
 
     end

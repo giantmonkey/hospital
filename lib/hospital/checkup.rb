@@ -30,6 +30,7 @@ module Hospital
       end
     rescue StandardError => e
       diagnosis.add_error "Unrescued exception in #{klass}.checkup:\n#{e.full_message}.\nThis is a bug inside the checkup method that should be fixed!"
+      diagnosis
     end
 
     def success?

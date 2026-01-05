@@ -29,7 +29,15 @@ RSpec.describe Hospital::Runner do
 
       it 'spits out JSON' do
         result = runner.do_checkup_all
-        expect(result['summary']['errors']).to eq 3
+        expect(result['summary']['errors']).to eq 4
+      end
+
+      it 'returns structured results with type and message' do
+        result = runner.do_checkup_all
+        diagnosis_results = result['General checks']['PatientWithCheckup:']
+        expect(diagnosis_results).to include(
+          { 'type' => 'warning', 'message' => 'Something is strange.' }
+        )
       end
     end
   end
