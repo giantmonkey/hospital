@@ -30,10 +30,13 @@ module Hospital
         }
       end
 
-      def put_diagnosis_result text
+      def put_diagnosis_result result
         @data[@current_group] ||= {}
         @data[@current_group][@current_diagnosis] ||= []
-        @data[@current_group][@current_diagnosis] << text
+        @data[@current_group][@current_diagnosis] << {
+          'type'    => result.type,
+          'message' => result.message
+        }
       end
 
       def result

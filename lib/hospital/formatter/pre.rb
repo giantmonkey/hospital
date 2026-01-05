@@ -26,8 +26,8 @@ module Hospital
         END
       end
 
-      def put_diagnosis_result text
-        @buffer << "\n#{text}"
+      def put_diagnosis_result result
+        @buffer << "\n#{result.output}"
       end
 
     end

@@ -62,24 +62,28 @@ class Hospital::Diagnosis
     end
 
     def put out
-      out.put_diagnosis_result output
+      out.put_diagnosis_result self
     end
   end
 
   class Info < Result
     def prefix; '🟢' end
+    def type; 'info' end
   end
 
   class Warning < Result
     def prefix; '🟠' end
+    def type; 'warning' end
   end
 
   class Skip < Result
     def prefix; '🟠' end
+    def type; 'skip' end
   end
 
   class Error < Result
     def prefix; '🔴' end
+    def type; 'error' end
   end
 
   def add_info message
