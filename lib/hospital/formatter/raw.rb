@@ -23,10 +23,11 @@ module Hospital
       def put_diagnosis_skipped text
       end
 
-      def put_summary errors_count, warnings_count
+      def put_summary errors_count, warnings_count, infos_count
         @data['summary'] = {
-          'errors'    => errors_count,
-          'warnings'  => warnings_count
+          'errors'   => errors_count,
+          'warnings' => warnings_count,
+          'infos'    => infos_count
         }
       end
 

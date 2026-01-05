@@ -17,12 +17,13 @@ module Hospital
         @buffer << "\n\n## Skipped #{text}"
       end
 
-      def put_summary errors_count, warnings_count
+      def put_summary errors_count, warnings_count, infos_count
         @buffer <<  <<~END
           \n\n
           #### Summary:
           Errors:   #{errors_count}
           Warnings: #{warnings_count}
+          Infos:    #{infos_count}
         END
       end
 

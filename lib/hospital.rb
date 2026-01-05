@@ -76,6 +76,7 @@ module Hospital
     def do_checkup_all
       errcount  = 0
       warcount  = 0
+      infocount = 0
 
       Hospital.groups.each do |group|
         @out.put_group_header group.header
@@ -83,8 +84,9 @@ module Hospital
 
         group.all_checkups.each do |checkup|
           if diagnosis = checkup.diagnosis
-            errcount += diagnosis.errors.count
-            warcount += diagnosis.warnings.count
+            errcount  += diagnosis.errors.count
+            warcount  += diagnosis.warnings.count
+            infocount += diagnosis.infos.count
 
             if !checkup.skipped && (!checkup.group.skipped || checkup.precondition)
               @out.put_diagnosis_header "#{diagnosis.name}:"
@@ -96,7 +98,7 @@ module Hospital
         end
       end
 
-      @out.put_summary errcount, warcount
+      @out.put_summary errcount, warcount, infocount
 
       @out.result
     end

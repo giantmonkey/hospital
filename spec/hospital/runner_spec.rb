@@ -30,6 +30,7 @@ RSpec.describe Hospital::Runner do
       it 'spits out JSON' do
         result = runner.do_checkup_all
         expect(result['summary']['errors']).to eq 4
+        expect(result['summary']['infos']).to eq 2
       end
 
       it 'returns structured results with type and message' do
