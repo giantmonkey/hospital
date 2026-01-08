@@ -1,12 +1,12 @@
 class PatientWithPreconditionAndDependent
   extend Hospital
 
-  checkup group: :test_group, precondition: true do |d|
+  checkup group: :test_group, precondition: true, title: 'precondition check' do |d|
     check_precondition
     d.add_error 'precondition failed'
   end
 
-  checkup group: :test_group do |d|
+  checkup group: :test_group, title: 'dependent check' do |d|
     check_dependent
     d.add_info 'dependent ran'
   end

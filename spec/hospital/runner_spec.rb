@@ -40,6 +40,31 @@ RSpec.describe Hospital::Runner do
           { 'type' => 'warning', 'message' => 'Something is strange.' }
         )
       end
+
+      it 'includes all groups in output' do
+        result = runner.do_checkup_all
+        group_names = result.keys - ['summary']
+        expect(group_names).to contain_exactly(
+          'General checks',
+          'Some group checks',
+          'Other group checks',
+          'Test group checks'
+        )
+      end
+
+      it 'includes empty diagnoses with empty array' do
+        result = runner.do_checkup_all
+        # PatientWithMultipleCheckups has two checkups that add no results
+        expect(result['General checks']).to have_key('PatientWithMultipleCheckups:')
+        expect(result['General checks']['PatientWithMultipleCheckups:']).to eq []
+      end
+
+      it 'includes skipped diagnoses with skipped flag' do
+        result = runner.do_checkup_all
+        # PatientWithCheckupGroups check_check1 is in :some_group which has a failed precondition
+        expect(result['Some group checks']).to have_key('PatientWithCheckupGroups:')
+        expect(result['Some group checks']['PatientWithCheckupGroups:']).to eq({ 'skipped' => true })
+      end
     end
   end
 end

@@ -115,8 +115,9 @@ module Hospital
             if !checkup.skipped && (!checkup.group.skipped || checkup.precondition)
               @out.put_diagnosis_header "#{diagnosis.name}:"
               diagnosis.put_results @out
-            elsif verbose
-              @out.put_diagnosis_skipped "Skipped #{diagnosis.name}."
+            elsif !checkup.skipped
+              # checkup was skipped due to group precondition failure
+              @out.put_diagnosis_skipped "#{diagnosis.name}:", verbose: verbose
             end
           end
         end

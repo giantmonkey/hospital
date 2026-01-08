@@ -13,8 +13,8 @@ module Hospital
         @buffer << "\nChecking #{text.h2.indented}"
       end
 
-      def put_diagnosis_skipped text
-        @buffer << "\nSkipped #{text.h2.indented}"
+      def put_diagnosis_skipped text, verbose: false
+        @buffer << "\nSkipped #{text.h2.indented}" if verbose
       end
 
       def put_summary errors_count, warnings_count, infos_count

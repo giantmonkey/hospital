@@ -7,20 +7,24 @@ module Hospital
     class Raw < Base
 
       def initialize
-        @data = {}
+        @data               = {}
         @current_group      = nil
         @current_diagnosis  = nil
       end
 
       def put_group_header text
         @current_group = text
+        @data[@current_group] ||= {}
       end
 
       def put_diagnosis_header text
         @current_diagnosis = text
+        @data[@current_group][@current_diagnosis] ||= []
       end
 
-      def put_diagnosis_skipped text
+      def put_diagnosis_skipped text, verbose: false
+        # don't overwrite existing entry (in case of name collision)
+        @data[@current_group][text] ||= { 'skipped' => true }
       end
 
       def put_summary errors_count, warnings_count, infos_count
@@ -32,8 +36,6 @@ module Hospital
       end
 
       def put_diagnosis_result result
-        @data[@current_group] ||= {}
-        @data[@current_group][@current_diagnosis] ||= []
         @data[@current_group][@current_diagnosis] << {
           'type'    => result.type,
           'message' => result.message

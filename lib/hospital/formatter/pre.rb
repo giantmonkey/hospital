@@ -13,8 +13,8 @@ module Hospital
         @buffer << "\n\n## Checking #{text}"
       end
 
-      def put_diagnosis_skipped text
-        @buffer << "\n\n## Skipped #{text}"
+      def put_diagnosis_skipped text, verbose: false
+        @buffer << "\n\n## Skipped #{text}" if verbose
       end
 
       def put_summary errors_count, warnings_count, infos_count
