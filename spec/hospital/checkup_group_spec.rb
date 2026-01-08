@@ -50,5 +50,29 @@ RSpec.describe Hospital::CheckupGroup do
         group.run_checkups
       end
     end
+
+    describe 'precondition fails - code block verification' do
+      let(:dependent_ran) { [] }
+      let(:checkup_dependent) do
+        ran = dependent_ran
+        Hospital::Checkup.new(Object, ->(d) { ran << :executed; d.add_info 'ran' })
+      end
+      let(:group_fresh) { Hospital::CheckupGroup.new :test_fresh }
+
+      before do
+        group_fresh.add_checkup checkup_pre_fail
+        group_fresh.add_checkup checkup_dependent
+      end
+
+      it 'does not execute dependent checkup code block' do
+        group_fresh.run_checkups
+        expect(dependent_ran).to be_empty
+      end
+
+      it 'marks the group as skipped' do
+        group_fresh.run_checkups
+        expect(group_fresh.skipped).to be true
+      end
+    end
   end
 end

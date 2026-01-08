@@ -25,10 +25,34 @@ module Hospital
     end
 
     # used to call the checkup for a specific class directly (in specs)
+    # respects preconditions: runs preconditions first, skips dependents if any fail
     def do_checkup(klass, verbose: false, ignore_condition: false)
-      @@groups.map(&:all_checkups).flatten.select{|cu| cu.klass == klass }.map do |cu|
-        cu.check verbose: verbose, ignore_condition: ignore_condition
+      checkups  = @@groups.map(&:all_checkups).flatten.select { |cu| cu.klass == klass }
+      by_group  = checkups.group_by(&:group)
+      results   = []
+
+      by_group.each do |group, group_checkups|
+        preconditions = group_checkups.select(&:precondition)
+        dependents    = group_checkups.reject(&:precondition)
+
+        # run preconditions first
+        preconditions_passed = true
+        preconditions.each do |cu|
+          result = cu.check verbose: verbose, ignore_condition: ignore_condition
+          results << result if result
+          preconditions_passed = false unless cu.success?
+        end
+
+        # only run dependents if all preconditions passed
+        if preconditions_passed
+          dependents.each do |cu|
+            result = cu.check verbose: verbose, ignore_condition: ignore_condition
+            results << result if result
+          end
+        end
       end
+
+      results
     end
 
     def find_or_create_checkup_group name

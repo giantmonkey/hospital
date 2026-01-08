@@ -62,5 +62,14 @@ RSpec.describe Hospital do
         diagnosis = Hospital.do_checkup(PatientWithMultipleCheckups)
       end
     end
+
+    describe 'preconditions' do
+      it 'skips dependent checkups when precondition fails' do
+        expect(PatientWithPreconditionAndDependent).to     receive(:check_precondition)
+        expect(PatientWithPreconditionAndDependent).not_to receive(:check_dependent)
+
+        Hospital.do_checkup(PatientWithPreconditionAndDependent)
+      end
+    end
   end
 end
