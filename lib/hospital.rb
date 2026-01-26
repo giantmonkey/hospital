@@ -31,6 +31,13 @@ module Hospital
       by_group  = checkups.group_by(&:group)
       results   = []
 
+      # warn if no checkups defined for this class
+      if checkups.empty?
+        diagnosis = Diagnosis.new(klass.name)
+        diagnosis.add_warning "#{klass.name}: No checks defined! Please call checkup with a lambda."
+        return [diagnosis]
+      end
+
       by_group.each do |group, group_checkups|
         preconditions = group_checkups.select(&:precondition)
         dependents    = group_checkups.reject(&:precondition)
