@@ -22,12 +22,22 @@ module Hospital
     end
 
     def add_checkup checkup
-      checkup.set_group self
+      source_location = checkup.code.source_location
 
       if checkup.precondition
+        if @precondition_checkups.any? { |cu| cu.code.source_location == source_location }
+          warn "Hospital: Skipping duplicate precondition checkup '#{checkup.diagnosis.name}' in group '#{name}'"
+          return
+        end
+        checkup.set_group self
         @precondition_checkups << checkup
       else
-                     @checkups << checkup
+        if @checkups.any? { |cu| cu.code.source_location == source_location }
+          warn "Hospital: Skipping duplicate checkup '#{checkup.diagnosis.name}' in group '#{name}'"
+          return
+        end
+        checkup.set_group self
+        @checkups << checkup
       end
     end
 
